@@ -4,14 +4,14 @@ using UnityEngine;
 
 public class CCDIK : MonoBehaviour
 {
-    // 関節がrootに近い方から順に格納されている。
+    // 関節がrootから遠い方から順に格納されている。
     public Transform[] joints;
     public Transform end;
     public Transform destination;
 
     void Update()
     {
-        if (Input.GetKeyDown("a"))
+        //if (Input.GetKeyDown("a"))
         {
             CCD(200);
         }
@@ -20,14 +20,13 @@ public class CCDIK : MonoBehaviour
     void CCD(int maxItr)
     {
         float dist = (destination.position - end.position).magnitude;
-        int k = 0;
-        while(dist > Mathf.Epsilon && k < maxItr) 
+
+        for(int i=0; i < maxItr && dist > Mathf.Epsilon; i++)
         {
-            k++;
             //末端に近いほうから
-            for(int i = 1; i<= joints.Length; i++) 
+            for(int k = 0; k < joints.Length; k++) 
             {
-                Transform j = joints[joints.Length - i];
+                Transform j = joints[k];
                 
                 Vector3 v1 = (end.position - j.position).normalized;
                 Vector3 v2 = (destination.position - j.position).normalized;
@@ -38,11 +37,8 @@ public class CCDIK : MonoBehaviour
                 float angle = Mathf.Acos(dot) * Mathf.Rad2Deg;
                 j.RotateAround(j.position, axis, angle);
 
-                //Debug.Log("dot: " + Vector3.Dot(v1, v2) + ", angle: " + angle);
             }
+            dist = (destination.position - end.position).magnitude;
         }
-        if(k >= maxItr)
-            Debug.Log("CCD terminated. k > " + maxItr);
-        
     }
 }
